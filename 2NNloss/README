@@ -1,0 +1,22 @@
+params.numsamples = 50;
+params.p = 0.5; % dropout rate
+params.p1 = 1; %dropout rate for bias
+
+function [nll,g, expHwdZ, labels] = Softmax2NN(W,X,k,decode,params,y1ofn)
+% Baseline softmax classification with 2 layer NN
+
+function [nll,g, expHwdZ, labels] = Softmax2NN_MCDropoutMulti(W,X,k,decode,params,y1ofn)
+% Real dropout 2NN take many samples
+
+function [se, g, yhat] = Linear2NNDet(W,X,k,decode,params,y)
+% 2 layer NN for regression with fast dropout
+
+function [nll,g, Mu3, labels] = LogisticOneVsAllDetLoss(W,X,k,decode, params,y1ofn)
+% 2 layer NN for 1 vs. all classification with dropout
+
+function [nll,g, EexpdZ, labels] = Softmax2NNLossFastSample(W,X,k,decode,params,y1ofn)
+% Sample from the Gaussian
+
+function [nll,g, weightedsum, labels] = Softmax2NNLossFastSigmaPoints(W,X,k,decode,params,y1ofn)
+% Use Sigma point
+

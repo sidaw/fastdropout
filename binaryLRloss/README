@@ -1,0 +1,27 @@
+function [nll,g,H,T] = LogisticLoss(w,X,y)
+% Baseline loss function from PMTK, with some optimizations
+
+function [nll,g,H] = LogisticLossMCDropout(w,X,y,ps)
+% Monte Carlo real dropout, single sample
+
+function [nll,g,H] = LogisticLossMCDropoutSample(w,X,y,ps, miniter, numiter)
+% Monte Carlo real dropout, numiter samples
+
+function [nll,g] = LogisticLossDetObjDropout(w,X,y,ps)
+% This is eq 8) of the ICML paper, intergrating the Gaussian
+
+function [nll,g] = LogisticLossDetObjDropoutDelta(w,X,y,ps)
+% Dropout loss via the Delta approximation, somewhat less accurate
+
+function [nll,g] = LogisticLossMCDropoutSampleGauss(w,X,y,ps, numsample)
+% Sample from the Gaussian
+
+function [nll,g] = LogisticLossMCDropoutSampleGaussIntegrate(w,X,y,ps, numsample)
+% Differenitate inside the expectation and then intergrate
+
+function [nll,g] = LogisticLossMCDropoutSampleGaussNumDiff(w,X,y,ps, numsample)
+% Use numerical diff to compute derivative
+
+
+
+
