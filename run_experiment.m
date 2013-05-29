@@ -1,14 +1,13 @@
 addpath(genpath('binaryLRloss'));
 load('example_data.mat');
+rand('seed', 0)
 C = cvpartition(y, 'kfold',2);
-
 Xtest = X(C.test(1),:);
 ytest = y(C.test(1));
 Xtrain = X(C.test(2),:);
 ytrain = y(C.test(2));
-
 %%
-w_init = 0*randn(params.dictsize+1,1);
+w_init = 0*randn(size(X,2),1);
 mfOptions.Method = 'lbfgs';
 mfOptions.optTol = 2e-2;
 mfOptions.progTol = 2e-6;
@@ -40,7 +39,12 @@ for casenum = 1:length(casenames)
     w = minFunc(funObjL2,w_init,mfOptions);
     ypred = Xtest * w > 0;
     acc = sum(ypred == (ytest+1)/2 )/length(ytest);
-    resultname = [ datasets{datanum} '-' casenames{casenum}];
+    
+%     ypred = Xtrain * w > 0;
+%     acc = sum(ypred == (ytrain+1)/2 )/length(ytrain);
+
+    
+    resultname = [casenames{casenum}];
     results(resultname) = acc;
 end
 
