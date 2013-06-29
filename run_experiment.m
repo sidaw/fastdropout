@@ -16,7 +16,7 @@ mfOptions.LS_init = 2;
 mfOptions.MaxIter = 250;
 mfOptions.DerivativeCheck = 0;
 results = containers.Map;
-casenames = {'LR','DetDropout','Dropout'};
+casenames = {'LR','DetDropout', 'DetDropoutApprox', 'Dropout'};
 for casenum = 1:length(casenames)
     obj = casenames{casenum};
     switch obj
@@ -28,6 +28,10 @@ for casenum = 1:length(casenames)
             
         case 'DetDropout'
             funObj = @(w)LogisticLossDetObjDropout(w,Xtrain,ytrain,0.5);
+            lambdaL2=0.01;
+            
+        case 'DetDropoutApprox'
+            funObj = @(w)LogisticLossDetObjDropoutDeltaApprox(w,Xtrain,ytrain,0.5);
             lambdaL2=0.01;
             
         case 'Dropout'
