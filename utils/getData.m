@@ -12,15 +12,21 @@ switch dataname
         Xtrain = X(C.test(2),:);
         ytrain = y(C.test(2),:);
     case '20newsbydate'
-        Xtestind = load('data/20news-bydate/matlab/test.data');
-        Xtest=spconvert(Xtestind);
-        Xtrainind = load('data/20news-bydate/matlab/train.data');
-        Xtrain=spconvert(Xtrainind);
-        
         ytestind = load('data/20news-bydate/matlab/test.label');
         ytrainind = load('data/20news-bydate/matlab/train.label');
         
         ytest=to1ofk(ytestind, 20);
         ytrain=to1ofk(ytrainind, 20);
+        
+        Xtestind = load('data/20news-bydate/matlab/test.data');
+        Xtest=spconvert(Xtestind);
+        Xtrainind = load('data/20news-bydate/matlab/train.data');
+        Xtrain=sparse(length(ytrainind), size(Xtest,2));
+        maxtrainind= max(Xtrainind,[],1);
+        
+        Xtrain(:,1:maxtrainind(2))=spconvert(Xtrainind);
+        
+        
+       
         
 end

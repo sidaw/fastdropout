@@ -3,22 +3,23 @@ addpath(genpath('softmaxloss'));
 addpath(genpath('utils'));
 
 % example or 20newsbydate
-[Xtrain, ytrain, Xtest, ytest] = getData('example');
+[Xtrain, ytrain, Xtest, ytest] = getData('20newsbydate');
 D = size(Xtrain,2);
 K = size(ytrain,2);
 
 %%
-w_init = 0.1*randn(D*K,1);
+w_init = 0.01*randn(D*K,1);
 mfOptions.Method = 'lbfgs';
 mfOptions.optTol = 2e-3;
 mfOptions.progTol = 2e-6;
 mfOptions.LS = 2;
 mfOptions.LS_init = 2;
-mfOptions.MaxIter = 5;
-mfOptions.DerivativeCheck = 1;
+mfOptions.MaxIter = 250;
+mfOptions.DerivativeCheck = 0;
 testresults = containers.Map;
 trainresults = containers.Map;
 casenames = {'LROnevall', 'LROnevallDelta', 'SoftmaxDelta'};
+%casenames = {'SoftmaxDelta'};
 for casenum = 1:length(casenames)
     obj = casenames{casenum};
     switch obj
@@ -32,7 +33,11 @@ for casenum = 1:length(casenames)
             
         case 'SoftmaxDelta'
             funObj = @(w)SoftmaxLossDetObjDropoutDelta(w,Xtrain,ytrain,0.5);
-            lambdaL2=0.1;
+            lambdaL2=0.01;
+            
+        case 'SoftmaxDeltaCheck'
+            funObj = @(w)SoftmaxLossDetObjDropoutDeltaGradTest(w,Xtrain,ytrain,0.5);
+            lambdaL2=0.01;
         end
     
     funObjL2 = @(w)penalizedL2(w,funObj,lambdaL2);
