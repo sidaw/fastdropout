@@ -29,27 +29,37 @@ switch dataname
         maxtrainind= max(Xtrainind,[],1);
         Xtrain(:,1:maxtrainind(2))=spconvert(Xtrainind);
         
-   case 'conll'
-        ytestind = load('data/conll-ner/devlabels');
-        ytrainind = load('data/conll-ner/trainlabels');
+        Xtrain = [ones(size(Xtrain,1),1), Xtrain];
+        Xtest = [ones(size(Xtest,1),1), Xtest];
         
-        ytest=to1ofk(ytestind,8);
-        ytrain=to1ofk(ytrainind,8);
+   case 'conll'
+%         302811 alllabels
+%         204567 trainlabels
+%         51578 devlabels
+%         46666 testlabels
+        trainsize = 204567;
+        devsize = 51578;
 
-        Xtestind = load('data/conll-ner/devvecs');
-        Xtest=spconvert(Xtestind);
-        Xtrainind = load('data/conll-ner/trainvecs');
-        Xtrain=sparse(length(ytrainind), size(Xtest,2));
-        maxtrainind= max(Xtrainind,[],1);
-        Xtrain(:,1:maxtrainind(2))=spconvert(Xtrainind);
-        tssize = size(Xtest,2);
-        trsize = size(Xtrain,2);
+       
+        yind = load('data/conll-ner/alllabels');
+      
+        y=to1ofk(yind,8);
+        Xind = load('data/conll-ner/allvecs');
+        X=spconvert(Xind);
+        X = [ones(size(X,1),1), X];
+        
+        ytrain = y(1:trainsize,:);
+        Xtrain = X(1:trainsize,:);
+        
+        ytest = y(trainsize+1:trainsize+devsize,:);
+        Xtest = X(trainsize+1:trainsize+devsize,:);
+        
         Xtrain = Xtrain(1:10000,:);
         ytrain = ytrain(1:10000,:);
-        Xtest(:, tssize+1:trsize)=0;
 end
 
-if filter<=max(ytrainind)
+
+if filter<=size(ytrain,2)
 ytestfilter = ytestind <= filter;
 ytrainfilter = ytrainind <= filter;
 

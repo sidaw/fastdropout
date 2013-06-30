@@ -7,8 +7,9 @@ addpath(genpath('utils'));
 D = size(Xtrain,2);
 K = size(ytrain,2);
 if ~exist('isconll','var')
-    isconll=0;
-    disp('not evaluating conll');
+    isconll=1;
+    evaltrain = 1;
+    disp('not defining conll');
 end
 
 %%
@@ -22,7 +23,7 @@ mfOptions.MaxIter = 250;
 mfOptions.DerivativeCheck = 'off';
 testresults = containers.Map;
 trainresults = containers.Map;
-% casenames = {'LROnevall', 'LROnevallDelta', 'SoftmaxDelta', 'Softmax'};
+casenames = {'Softmax', 'SoftmaxDelta'};
 % casenames = {'LROnevallDelta','SoftmaxDelta', 'Softmax'};
 for casenum = 1:length(casenames)
     obj = casenames{casenum};
@@ -48,12 +49,14 @@ for casenum = 1:length(casenames)
             lambdaL2=0.1;
             
         end
-    
+    lambdaL2=0.001;
     funObjL2 = @(w)penalizedL2(w,funObj,lambdaL2);
     W = minFunc(funObjL2,w_init,mfOptions);
     W = reshape(W, D, K);
     
     resultname = [casenames{casenum}];
+    
+    save(['W-' resultname], 'W');
     
     ypredsoft = Xtest * W;
     [~, ypredtst] = max(ypredsoft, [], 2);
@@ -67,21 +70,25 @@ for casenum = 1:length(casenames)
     
     if isconll
         save([resultname '.testres'], 'ypredtst', '-ascii');
-        save([resultname '.trainres'], 'ypredtr', '-ascii');
+        lblcmd = ['echo ' resultname '>> tstresults'];
         pycommandtst = ...
             ['./data/conll-ner/generateconnloutput.py '...
             resultname '.testres data/conll-ner/devfields >' resultname '.conlltest'];
         perlcommandtst = ['./data/conll-ner/conlleval.pl <' resultname '.conlltest' '>> tstresults'];
         
-        unix([pycommandtst ';' perlcommandtst]);
+        unix([lblcmd ';' pycommandtst ';' perlcommandtst]);
         
+        if evaltrain
+        save([resultname '.trainres'], 'ypredtr', '-ascii');
+        lblcmdtr = ['echo ' resultname '>> ' 'trainresults'];
+
         pycommandtr = ...
             ['./data/conll-ner/generateconnloutput.py '...
             resultname '.trainres data/conll-ner/trainfields >' resultname '.conlltrain'];
         perlcommandtr = ['./data/conll-ner/conlleval.pl <' resultname '.conlltrain' '>> trainresults'];
 
-        unix([pycommandtr ';' perlcommandtr]);
-        
+        unix([lblcmdtr ';' pycommandtr ';' perlcommandtr]);
+        end
     end
  end
 
