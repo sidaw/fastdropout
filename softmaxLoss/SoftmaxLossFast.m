@@ -12,6 +12,7 @@ end
 w = reshape(w,[p k]);
 %w(:,k) = zeros(p,1);
 Xw = X*w;
+Xw = bsxfun(@minus, Xw, max(Xw,[],2) );
 expXw = exp(Xw);
 Z = sum(expXw,2);
 expXwdZ = bsxfun(@rdivide, expXw, Z);

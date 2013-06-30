@@ -16,8 +16,8 @@ g = zeros(size(W));
 Xw = X*bsxfun(@times, pvec, W);
 X2 = X.*X;
 
-normalize = bsxfun(@minus, Xw, max(Xw,[],2) );
-expXw = exp(normalize);
+Xw = bsxfun(@minus, Xw, max(Xw,[],2) );
+expXw = exp(Xw);
 Z = sum(expXw,2);
 expXwdZ = bsxfun(@rdivide, expXw, Z);
 
@@ -29,22 +29,22 @@ for k = 1:K
     VarXw = (X2) * (w.*w.*pvec.*(1-pvec));
     % SigmaXw = sqrt(SigmaXw2);
     % randn('seed', 5)
-    
-    nlldet = sum(-y.*log( Pk )) + sum(0.5.*Pk.*(1-Pk).*VarXw);
+    alpha = 0.1;
+    nlldet = sum(-y.*log( Pk )) + alpha*sum(0.5.*Pk.*(1-Pk).*VarXw);
     dmu = -(y-Pk);
     
     dPk =  bsxfun(@times, -Pk,expXwdZ);
     dPk(:,k) = dPk(:,k) +  Pk;
-     dPk1minusPk = bsxfun(@times, dPk, 0.5.*(1-Pk).*VarXw)+...
+    dPk1minusPk = bsxfun(@times, dPk, 0.5.*(1-Pk).*VarXw)+...
          bsxfun(@times, -dPk, 0.5.*Pk.*VarXw);
     
     %dPk1minusPk = bsxfun(@times, dPk, 0.5.*VarXw); 
     dEx = pvec .* (dmu'*X)';
     
-    dsigma = Pk.*(1-Pk); % *0.5
+    dsigma = alpha*Pk.*(1-Pk); % *0.5
     dS2 = w.*pvec.*(1-pvec) .* (dsigma'*X2)'; % *2
     g(:,k) =  dEx + dS2;
-    g = g + bsxfun(@times,pvec,(dPk1minusPk'*X)');
+    g = g + alpha*bsxfun(@times,pvec,(dPk1minusPk'*X)');
     
     tnll = tnll + nlldet;
 end

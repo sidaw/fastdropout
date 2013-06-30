@@ -33,8 +33,8 @@ switch dataname
         ytestind = load('data/conll-ner/devlabels');
         ytrainind = load('data/conll-ner/trainlabels');
         
-        ytest=to1ofk(ytestind,8);
-        ytrain=to1ofk(ytrainind,8);
+        ytest=to1ofk(ytestind);
+        ytrain=to1ofk(ytrainind);
 
         Xtestind = load('data/conll-ner/devvecs');
         Xtest=spconvert(Xtestind);
@@ -42,11 +42,9 @@ switch dataname
         Xtrain=sparse(length(ytrainind), size(Xtest,2));
         maxtrainind= max(Xtrainind,[],1);
         Xtrain(:,1:maxtrainind(2))=spconvert(Xtrainind);
-        tssize = size(Xtest,2);
-        trsize = size(Xtrain,2);
-        Xtrain = Xtrain(1:10000,:);
-        ytrain = ytrain(1:10000,:);
-        Xtest(:, tssize+1:trsize)=0;
+        tssize = size(Xtest,1);
+        trsize = size
+        Xtest(tssize:trsize,:)=0;
 end
 
 if filter<=max(ytrainind)
