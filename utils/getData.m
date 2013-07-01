@@ -54,8 +54,37 @@ switch dataname
         ytest = y(trainsize+1:trainsize+devsize,:);
         Xtest = X(trainsize+1:trainsize+devsize,:);
         
-        Xtrain = Xtrain(1:10000,:);
-        ytrain = ytrain(1:10000,:);
+        Xtrain = Xtrain(1:5000,:);
+        ytrain = ytrain(1:5000,:);
+        
+           
+   case 'conlliid'
+%         302811 alllabels
+%         204567 trainlabels
+%         51578 devlabels
+%         46666 testlabels
+        trainsize = 204567;
+        devsize = 51578;
+        
+        yind = load('data/conll-ner/alllabels');
+      
+        y=to1ofk(yind,8);
+        Xind = load('data/conll-ner/allvecs');
+        X=spconvert(Xind);
+        X = [ones(size(X,1),1), X];
+        X = X(randperm(size(X,1)), :);
+        
+        trsize = 20000;
+        tssize = 20000;
+        
+        ytrain = y(1:trsize,:);
+        Xtrain = X(1:trsize,:);
+        
+        ytest = y(trsize+1:trsize+tssize,:);
+        Xtest = X(trsize+1:trsize+tssize,:);
+
+        
+        
 end
 
 
