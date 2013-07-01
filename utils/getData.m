@@ -54,8 +54,8 @@ switch dataname
         ytest = y(trainsize+1:trainsize+devsize,:);
         Xtest = X(trainsize+1:trainsize+devsize,:);
         
-        Xtrain = Xtrain(1:5000,:);
-        ytrain = ytrain(1:5000,:);
+        Xtrain = Xtrain(1:10000,:);
+        ytrain = ytrain(1:10000,:);
         
            
    case 'conlliid'
