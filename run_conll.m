@@ -2,13 +2,10 @@ addpath(genpath('binaryLRloss'));
 addpath(genpath('softmaxLoss'));
 addpath(genpath('utils'));
 
-% example or 20newsbydate conll
-[Xtrain, ytrain, Xtest, ytest] = getData('conll');
-D = size(Xtrain,2);
-K = size(ytrain,2);
+
 
 %%
-w_init = 0.01*randn(D*K,1);
+
 mfOptions.Method = 'lbfgs';
 mfOptions.optTol = 2e-3;
 mfOptions.progTol = 2e-6;
@@ -17,25 +14,35 @@ mfOptions.LS_init = 2;
 mfOptions.MaxIter = 250;
 mfOptions.DerivativeCheck = 'off';
 
-
-
-if ~exist('params', 'var')
+doreset = isfield(params, 'reset') && params.reset;
+if ~exist('params', 'var') || doreset
 params.discoef = 0.1;
 params.lambdaL2=0.001;
 params.evaliid = 0;
+params.dataset = 'conll';
+params.isdev = 0;
+params.reset = 0;
 testresults = containers.Map;
 trainresults = containers.Map;
+if reset
+    disp('resetting');
+end
 end
 
 disp(mfOptions)
 disp(params)
 
+% example or 20newsbydate conll
+[Xtrain, ytrain, Xtest, ytest, Xu] = getData(params.dataset);
+D = size(Xtrain,2);
+K = size(ytrain,2);
+w_init = 0.01*randn(D*K,1);
+
 casenames = {'SoftmaxDeltaMore', 'SoftmaxDelta', ...
-    'Softmax',...
-    'LROnevall', 'LROnevallDelta'};
-casenames = { ...
-    'LROnevallDeltaMore', 'LROnevallDet'};
-Xu = Xtest;
+    'Softmax'};
+% ,...    'LROnevall', 'LROnevallDelta'};
+% casenames = { ...
+%    'LROnevallDeltaMore', 'LROnevallDet'};
 for casenum = 1:length(casenames)
     obj = casenames{casenum};
     switch obj
@@ -68,61 +75,20 @@ for casenum = 1:length(casenames)
     
     save(['W-' resultname], 'W');
     
+    paramstring = sprintf('%s:a=%f,lambda=%f,trainsize=%d', resultname, params.discoef, params.lambdaL2, size(Xtrain,1) );
+    % using actual CoNLL scheme, not using iid data
+
     ypredsoft = Xtest * W;
     [~, ypredtst] = max(ypredsoft, [], 2);
-    acc = sum(ypredtst==oneofktoscalar(ytest)) / size(ytest,1);
-    testresults(resultname) = mean(acc);
+    acc = evalconll(params.evaliid, ypredtst, ytest, resultname, paramstring, 'conlltest', params.isdev);
+    testresults(resultname) = acc;
 
     ypredsoft = Xtrain * W;
     [~, ypredtr] = max(ypredsoft, [], 2);
-    acc = sum(ypredtr == oneofktoscalar(ytrain) ) / size(ytrain,1);
-    trainresults(resultname) = mean(acc);
-    paramstring = sprintf('%s:a=%f,lambda=%f,trainsize=%d', resultname, params.discoef, params.lambdaL2, size(Xtrain,1) );
-    % using actual CoNLL scheme, not using iid data
-    if params.evaliid == 0
-        save([resultname '.testres'], 'ypredtst', '-ascii');
-        lblcmd = ['echo ' paramstring '>> tstresults'];
-        pycommandtst = ...
-            ['./data/conll-ner/generateconnloutput.py '...
-            resultname '.testres data/conll-ner/devfields >' resultname '.conlltest'];
-        perlcommandtst = ['./data/conll-ner/conlleval.pl <' resultname '.conlltest' '>> tstresults'];
+    acc = evalconll(params.evaliid, ypredtr, ytrain, resultname, paramstring, 'conlltrain', params.isdev);
+    trainresults(resultname) = acc;
+    
         
-        unix([lblcmd ';' pycommandtst ';' perlcommandtst]);
-        
-        if 1
-        save([resultname '.trainres'], 'ypredtr', '-ascii');
-        lblcmdtr = ['echo ' paramstring '>> ' 'trainresults'];
-
-        pycommandtr = ...
-            ['./data/conll-ner/generateconnloutput.py '...
-            resultname '.trainres data/conll-ner/trainfields >' resultname '.conlltrain'];
-        perlcommandtr = ['./data/conll-ner/conlleval.pl <' resultname '.conlltrain' '>> trainresults'];
-
-        unix([lblcmdtr ';' pycommandtr ';' perlcommandtr]);
-        end
-    else
-        % tokenmap = ['B-LOC', 'B-MISC', 'B-ORG', 'I-LOC', 'I-MISC', 'I-ORG', 'I-PER', 'O'];
-        ytesttrue = oneofktoscalar(ytest);
-        fname = [resultname '.tst.idd'];
-        file = fopen(fname, 'w+');
-        for j = 1:length(ytesttrue)
-            fprintf(file, 'dontknowtoken %d %d\n', ytesttrue(j), ypredtst(j) );
-        end
-        perlcommandtst = ['./data/conll-ner/conlleval.pl -r -o 8 < ' fname '>> tstresults'];
-        lblcmd = ['echo idd' paramstring '>> tstresults'];
-        unix([lblcmd ';' perlcommandtst]);
-        
-        
-        ytraintrue = oneofktoscalar(ytrain);
-        fname = [resultname '.tr.idd'];
-        file = fopen(fname, 'w+');
-        for j = 1:length(ytraintrue)
-            fprintf(file, 'dontknowtoken %d %d\n', ytraintrue(j), ypredtr(j) );
-        end
-        perlcommandtr = ['./data/conll-ner/conlleval.pl -r -o 8 < ' fname '>> trainresults'];
-        lblcmd = ['echo idd' paramstring '>> tstresults'];
-        unix([lblcmd ';' perlcommandtr]);
-    end
  end
 
 keys = testresults.keys;

@@ -1,8 +1,9 @@
-function [Xtrain, ytrain, Xtest, ytest] = getData(dataname, filter)
+function [Xtrain, ytrain, Xtest, ytest, Xu] = getData(dataname, filter)
 
 if ~exist('filter','var')
     filter = 100;
 end
+Xu = 0;
 
 switch dataname
     case 'example' 
@@ -51,12 +52,13 @@ switch dataname
         ytrain = y(1:trainsize,:);
         Xtrain = X(1:trainsize,:);
         
-        ytest = y(trainsize+1:trainsize+devsize,:);
-        Xtest = X(trainsize+1:trainsize+devsize,:);
+        ytest = y(trainsize+devsize+1:end,:);
+        Xtest = X(trainsize+devsize+1:end,:);
         
+        Xu = Xtest;
+
         Xtrain = Xtrain(1:10000,:);
         ytrain = ytrain(1:10000,:);
-        
            
    case 'conlliid'
 %         302811 alllabels
@@ -72,19 +74,19 @@ switch dataname
         Xind = load('data/conll-ner/allvecs');
         X=spconvert(Xind);
         X = [ones(size(X,1),1), X];
-        X = X(randperm(size(X,1)), :);
-        
-        trsize = 20000;
-        tssize = 20000;
+        perm = randperm(size(X,1));
+        X = X(perm, :);
+        y = y(perm, :);
+        trsize = 10000;
+        tssize = 10000;
         
         ytrain = y(1:trsize,:);
         Xtrain = X(1:trsize,:);
         
         ytest = y(trsize+1:trsize+tssize,:);
         Xtest = X(trsize+1:trsize+tssize,:);
-
         
-        
+        Xu = X(trsize+tssize:trsize+2*tssize,:);
 end
 
 
