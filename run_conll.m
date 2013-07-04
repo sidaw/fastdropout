@@ -24,7 +24,7 @@ params.isdev = 0;
 params.reset = 0;
 testresults = containers.Map;
 trainresults = containers.Map;
-if reset
+if doreset
     disp('resetting');
 end
 end
@@ -32,7 +32,7 @@ end
 disp(mfOptions)
 disp(params)
 
-% example or 20newsbydate conll
+% example or 20newsbydate conll sector
 [Xtrain, ytrain, Xtest, ytest, Xu] = getData(params.dataset);
 D = size(Xtrain,2);
 K = size(ytrain,2);
@@ -61,8 +61,7 @@ for casenum = 1:length(casenames)
         case 'SoftmaxDeltaMore'
             funObj = @(w)SoftmaxLossDetObjDropoutDeltaMoreData(w,Xtrain,ytrain,0.5, Xu, params.discoef);
         case 'Softmax'
-            funObj = @(w)SoftmaxLossFast(w,Xtrain,ytrain);
-            
+            funObj = @(w)SoftmaxLossFast(w,Xtrain,ytrain);       
         case 'SoftmaxDeltaCheck'
             funObj = @(w)SoftmaxLossDetObjDropoutDeltaGradTest(w,Xtrain,ytrain,0.5);
 

@@ -6,7 +6,7 @@ end
 Xu = 0;
 
 switch dataname
-    case 'example' 
+    case 'example'
         load('example_data.mat');
         rand('seed', 0)
         C = cvpartition(y, 'kfold',2);
@@ -22,7 +22,7 @@ switch dataname
         
         ytest=to1ofk(ytestind, 20);
         ytrain=to1ofk(ytrainind, 20);
-
+        
         Xtestind = load('data/20news-bydate/matlab/test.data');
         Xtest=spconvert(Xtestind);
         Xtrainind = load('data/20news-bydate/matlab/train.data');
@@ -32,18 +32,24 @@ switch dataname
         
         Xtrain = [ones(size(Xtrain,1),1), Xtrain];
         Xtest = [ones(size(Xtest,1),1), Xtest];
-        
-   case 'conll'
-%         302811 alllabels
-%         204567 trainlabels
-%         51578 devlabels
-%         46666 testlabels
+    case '20newslibsvm'
+        getLIBSVMstd('data/20news-libsvm/news20', 'data/20news-libsvm/news20.t')
+    case 'sector'
+        getLIBSVMstd('data/sector/sector', 'data/sector/sector.t')
+    case 'protein'
+        getLIBSVMstd('data/protein/protein', 'data/protein/protein.t')
+
+    case 'conll'
+        %         302811 alllabels
+        %         204567 trainlabels
+        %         51578 devlabels
+        %         46666 testlabels
         trainsize = 204567;
         devsize = 51578;
-
-       
+        
+        
         yind = load('data/conll-ner/alllabels');
-      
+        
         y=to1ofk(yind,8);
         Xind = load('data/conll-ner/allvecs');
         X=spconvert(Xind);
@@ -56,20 +62,20 @@ switch dataname
         Xtest = X(trainsize+devsize+1:end,:);
         
         Xu = Xtest;
-
+        
         Xtrain = Xtrain(1:10000,:);
         ytrain = ytrain(1:10000,:);
-           
-   case 'conlliid'
-%         302811 alllabels
-%         204567 trainlabels
-%         51578 devlabels
-%         46666 testlabels
+        
+    case 'conlliid'
+        %         302811 alllabels
+        %         204567 trainlabels
+        %         51578 devlabels
+        %         46666 testlabels
         trainsize = 204567;
         devsize = 51578;
         
         yind = load('data/conll-ner/alllabels');
-      
+        
         y=to1ofk(yind,8);
         Xind = load('data/conll-ner/allvecs');
         X=spconvert(Xind);
@@ -91,14 +97,33 @@ end
 
 
 if filter<=size(ytrain,2)
-ytestfilter = ytestind <= filter;
-ytrainfilter = ytrainind <= filter;
+    ytestfilter = ytestind <= filter;
+    ytrainfilter = ytrainind <= filter;
+    
+    Xtrain=1*(Xtrain(ytrainfilter, :)>0);
+    ytrain=ytrain(ytrainfilter, 1:filter);
+    
+    Xtest=1*(Xtest(ytestfilter, :)>0);
+    ytest=ytest(ytestfilter, 1:filter);
+    
+end
+    function [] = getLIBSVMstd(trainpath, testpath)
+        [Xtrain, ytrainind] = libsvmReadSparse(trainpath,1);
+        [Xtest, ytestind] = libsvmReadSparse(testpath,1);
+        [Xtrain,Xtest] = makeEqual(Xtrain, Xtest);
+        ytest=to1ofk(ytestind, 20);
+        ytrain=to1ofk(ytrainind, 20);
+        Xu = Xtest;
+    end
 
-Xtrain=1*(Xtrain(ytrainfilter, :)>0);
-ytrain=ytrain(ytrainfilter, 1:filter);
+end
 
-Xtest=1*(Xtest(ytestfilter, :)>0);
-ytest=ytest(ytestfilter, 1:filter);
-
+function [A, B] = makeEqual(A,B)
+    a = size(A,2); b = size(B,2);
+    if a>b
+        B = [B, zeros(size(B,1), a-b) ];
+    elseif b>a
+        A = [A, zeros(size(A,1), b-a) ];
+    end
 end
 
