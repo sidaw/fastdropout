@@ -33,9 +33,12 @@ switch dataname
         Xtrain = [ones(size(Xtrain,1),1), Xtrain];
         Xtest = [ones(size(Xtest,1),1), Xtest];
     case '20newslibsvm'
-        [Xtrain, ytrain] = mlcompReadData('data/20news-libsvm/news20');
-        [Xtest, ytest] = mlcompReadData('data/20news-libsvm/news20.t');
-        [Xtrain,Xtest] = makeEqual(Xtrain, Xtest);
+        getLIBSVMstd('data/20news-libsvm/news20', 'data/20news-libsvm/news20.t', 1)
+    case 'sector'
+        getLIBSVMstd('data/sector/sector', 'data/sector/sector.t')
+    case 'protein'
+        getLIBSVMstd('data/protein/protein', 'data/protein/protein.t')
+
     case 'conll'
         %         302811 alllabels
         %         204567 trainlabels
@@ -104,14 +107,36 @@ if filter<=size(ytrain,2)
     ytest=ytest(ytestfilter, 1:filter);
     
 end
+    function [] = getLIBSVMstd(trainpath, testpath, binary)
+        if ~exist('binary', 'var')
+            binary=1;
+        end
+        if ~exist('libsvmread', 'file')
+            [Xtrain, ytrainind] = libsvmReadSparse(trainpath,binary);
+            [Xtest, ytestind] = libsvmReadSparse(testpath,binary);
+        else
+            [ytrainind, Xtrain] = libsvmread(trainpath);
+            [ytestind, Xtest] = libsvmread(testpath);
+            if binary
+                Xtrain = Xtrain>1;
+                Xtest = Xtest>1;
+            end
+        end
+        [Xtrain,Xtest] = makeEqual(Xtrain, Xtest);
+        ytrain=to1ofk(ytrainind+1);
+        maxtrain = size(ytrain,2);
+        ytest=to1ofk(ytestind+1, maxtrain);
+        Xu = Xtest;
+    end
+
+end
 
 function [A, B] = makeEqual(A,B)
     a = size(A,2); b = size(B,2);
     if a>b
-        B = [B, zeros(size(B,1), b-a) ];
+        B = [B, zeros(size(B,1), a-b) ];
     elseif b>a
-        
+        A = [A, zeros(size(A,1), b-a) ];
     end
-        
 end
 

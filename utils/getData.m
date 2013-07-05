@@ -33,11 +33,15 @@ switch dataname
         Xtrain = [ones(size(Xtrain,1),1), Xtrain];
         Xtest = [ones(size(Xtest,1),1), Xtest];
     case '20newslibsvm'
-        getLIBSVMstd('data/20news-libsvm/news20', 'data/20news-libsvm/news20.t')
+        getLIBSVMstd('data/20news-libsvm/news20', 'data/20news-libsvm/news20.t', 1)
     case 'sector'
-        getLIBSVMstd('data/sector/sector', 'data/sector/sector.t')
+        getLIBSVMstd('data/sectorscale/sector.scale', 'data/sectorscale/sector.t.scale', 1)
+    case 'sectorscale'
+        getLIBSVMstd('data/sectorscale/sector.scale', 'data/sectorscale/sector.t.scale', 0)
     case 'protein'
-        getLIBSVMstd('data/protein/protein', 'data/protein/protein.t')
+        getLIBSVMstd('data/protein/protein', 'data/protein/protein.t', 0)
+    case 'rcv1'
+        getLIBSVMstd('data/rcv1/rcv1_train.multiclass', 'data/rcv1/rcv1_test.multiclass', 1)
 
     case 'conll'
         %         302811 alllabels
@@ -107,12 +111,27 @@ if filter<=size(ytrain,2)
     ytest=ytest(ytestfilter, 1:filter);
     
 end
-    function [] = getLIBSVMstd(trainpath, testpath)
-        [Xtrain, ytrainind] = libsvmReadSparse(trainpath,1);
-        [Xtest, ytestind] = libsvmReadSparse(testpath,1);
+    function [] = getLIBSVMstd(trainpath, testpath, binary)
+        if ~exist('binary', 'var')
+            binary=1;
+        end
+        if ~exist('libsvmread', 'file')
+            [Xtrain, ytrainind] = libsvmReadSparse(trainpath,binary);
+            [Xtest, ytestind] = libsvmReadSparse(testpath,binary);
+            ytrain=to1ofk(ytrainind);
+            ytest=to1ofk(ytestind);
+        else
+            [ytrainind, Xtrain] = libsvmread(trainpath);
+            [ytestind, Xtest] = libsvmread(testpath);
+            if binary
+                Xtrain = 1.0*(Xtrain>0);
+                Xtest = 1.0*(Xtest>0);
+            end
+            ytrain=to1ofk(ytrainind+1);
+            ytest=to1ofk(ytestind+1);
+        end
         [Xtrain,Xtest] = makeEqual(Xtrain, Xtest);
-        ytest=to1ofk(ytestind, 20);
-        ytrain=to1ofk(ytrainind, 20);
+        
         Xu = Xtest;
     end
 
@@ -125,5 +144,7 @@ function [A, B] = makeEqual(A,B)
     elseif b>a
         A = [A, zeros(size(A,1), b-a) ];
     end
+    B = [ones(size(B,1),1), B];
+    A = [ones(size(A,1),1), A];
 end
 

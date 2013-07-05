@@ -4,23 +4,23 @@ addpath(genpath('utils'));
 
 
 %%
-w_init = 0.01*randn(D*K,1);
 mfOptions.Method = 'lbfgs';
 mfOptions.optTol = 2e-3;
 mfOptions.progTol = 2e-6;
 mfOptions.LS = 2;
 mfOptions.LS_init = 2;
-mfOptions.MaxIter = 50;
+mfOptions.MaxIter = 150;
 mfOptions.DerivativeCheck = 'off';
+mfOptions.Corr = 8;
 testresults = containers.Map;
 trainresults = containers.Map;
 
 
 if ~exist('params', 'var') || isfield(params, 'reset') && params.reset
-    params.discoef = 0.5;
-    params.lambdaL2=0.01;
+    params.discoef = 1;
+    params.lambdaL2=0.001;
     params.evaliid = 0;
-    params.dataset = 'conll';
+    params.dataset = 'sector';
     params.isdev = 0;
     params.reset = 0;
     testresults = containers.Map;
@@ -29,14 +29,15 @@ if ~exist('params', 'var') || isfield(params, 'reset') && params.reset
     disp('resetting');
 end
 
-% example or 20newsbydate conll 20newslibsvm
-datasetname = 'sector';
+% example or 20newsbydate conll 20newslibsvm rcv1
+datasetname = params.dataset;
 [Xtrain, ytrain, Xtest, ytest, Xu] = getData(datasetname);
 D = size(Xtrain,2);
 K = size(ytrain,2);
+w_init = 0.01*randn(D*K,1);
 
-casenames = {'LROnevall', 'LROnevallDelta', 'LROnevallDeltaMore', 'LROnevallDet'};
-casenames = {'SoftmaxDeltaMore', 'SoftmaxDelta', 'Softmax'};
+
+casenames = {'Softmax','SoftmaxDeltaMore', 'SoftmaxDelta', 'LROnevall'}%, 'LROnevallDelta', 'LROnevallDeltaMore', 'LROnevallDet'};
 for casenum = 1:length(casenames)
     obj = casenames{casenum};
     switch obj
