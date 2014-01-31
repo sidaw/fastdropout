@@ -10,10 +10,7 @@ numh2 = hyperparams.numh2;
 numh1 = hyperparams.numh1;
 lambda = hyperparams.lambda; 
 lossfunc = hyperparams.lossfunc;
-
 nclass = 10;
-
-
 % setSeed(0);
 if hyperparams.dataset == 0
 [Xtrain, ytrain, Xtest, ytest] = mnistLoad([0:nclass-1], Ntrain);
@@ -68,7 +65,7 @@ else
 end
 
 
-  for k = 1:numiter
+for k = 1:numiter
   tic;
 %   funObj = @(w, Xtrain, y1ofn) penalizedL2(w, @(ww) lossfunc(ww, Xtrain, nclass, params, hyperparams, y1ofn), lambda);
 %   [w, finalObj, exitflag] = minFuncsd(funObj, Xtrain, y1ofn, W, options);
@@ -85,7 +82,6 @@ end
   writeResults(tacc, tracc, hyperparams)
   save(['results/nn2_' num2str(k) '_' getparamsstring(hyperparams) '.mat'], 'w', 'tacc', 'tracc', 'params','hyperparams');
   end
-
   if 0
      figure;
      plot(fvalTrace, 'o-', 'linewidth', 2);

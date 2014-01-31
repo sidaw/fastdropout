@@ -1,13 +1,15 @@
 function [w, finalObj] = minFuncAdagrad(funObj,  W, X, y, options)
-    eta = 100;
+    eta = options.eta;
     w = W;
-    options.batchsize = 100;
     numdata = size(X,1);
-    G = 1e-150*ones(size(W));
+    G = 1e-10*ones(size(W));
     fprintf('Batchsize:%d\tMaxIter:%d\tNumdata:%d\n', ...
         options.BatchSize, options.MaxIter, numdata)
     for t = 1:options.MaxIter
         batchobj = 0;
+        perm = randperm(length(y));
+        X = X(perm, :);
+        y = y(perm);
         for b = 1:ceil(size(X,1)/options.BatchSize)
             select = (b-1)* options.BatchSize+1:min(b* options.BatchSize, numdata);
             [finalObj, g] = funObj(w,X(select, :), y(select,:));
@@ -18,6 +20,6 @@ function [w, finalObj] = minFuncAdagrad(funObj,  W, X, y, options)
 
             w = w - eta*g./sqrt(G);
         end
-        fprintf('%d\t%f\t%f\n', t, batchobj/numdata, norm(g))
+        fprintf('%d\t%f\t%f\n', t, batchobj, norm(g))
     end
 end

@@ -1,16 +1,16 @@
-function [w, finalObj, exitflag] = minFuncsd(funObj, X, y, W, options)
-    eps0 = 10;
+function [w, finalObj, exitflag] = minFuncsd(funObj, W, X, y, options)
+    eps0 = 1;
     f = 0.998;
     pi = 0.5;
     pf = 0.99;
-    T = 500;
+    T = 70;
     w = W;
     deltatm1 = 0;
-    batchsize = 100;
+    batchsize = options.BatchSize;
     numdata = size(X,1);
     fprintf('Batchsize:%d\tMaxIter:%d\tNumdata:%d\n', ...
-        batchsize, options.maxIter, numdata)
-    for t = 1:options.maxIter
+        batchsize, options.MaxIter, numdata)
+    for t = 1:options.MaxIter
         if t<T
             pt = t/T*pi + (1-t/T)*pf;
         else

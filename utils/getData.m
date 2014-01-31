@@ -1,11 +1,26 @@
 function [Xtrain, ytrain, Xtest, ytest, Xu] = getData(dataname, filter)
 
 if ~exist('filter','var')
-    filter = 100;
+    filter = 500;
 end
 Xu = 0;
 
 switch dataname
+    case 'reuters'
+        temp = load('data/matfiles/Reuters21578.mat');
+        matlabgenereal()
+        breakIntoParts();
+        
+    case 'rcv4'
+        temp = load('data/matfiles/RCV1_4Class.mat');
+        matlabgenereal()
+        %breakIntoParts();
+        
+    case 'tdt2_top30'
+        temp = load('data/matfiles/TDT2.mat');
+        matlabgenereal()
+        %breakIntoParts();
+        
     case 'example'
         load('example_data.mat');
         rand('seed', 0)
@@ -34,6 +49,14 @@ switch dataname
         Xtest = [ones(size(Xtest,1),1), Xtest];
     case '20newslibsvm'
         getLIBSVMstd('data/20news-libsvm/news20', 'data/20news-libsvm/news20.t', 1)
+    case '20newslibsvmsemi'
+        getLIBSVMstd('data/20news-libsvm/news20', 'data/20news-libsvm/news20.t', 1)
+        breakIntoParts();
+    case 'sectorsemi'
+        getLIBSVMstd('data/sectorscale/sector.scale', 'data/sectorscale/sector.t.scale', 1)
+        breakIntoParts();
+        
+        %Xu = X(2*part+1:end,:);
     case 'sector'
         getLIBSVMstd('data/sectorscale/sector.scale', 'data/sectorscale/sector.t.scale', 1)
     case 'sectorscale'
@@ -111,6 +134,24 @@ if filter<=size(ytrain,2)
     ytest=ytest(ytestfilter, 1:filter);
     
 end
+    function [] = matlabgenereal()
+        y = temp.gnd;
+        
+        X = temp.fea;
+        if ~isfield(temp, 'testIdx')
+            rand('seed', 0)
+            C = cvpartition(y, 'kfold',2);
+            temp.testIdx = C.test(1);
+            temp.trainIdx = C.training(1);
+        end
+        y= to1ofk(y);
+        Xtest = X(temp.testIdx,:);
+        ytest = y(temp.testIdx,:);
+        Xtrain = X(temp.trainIdx,:);
+        ytrain = y(temp.trainIdx,:);
+        Xu = Xtest;
+    end
+
     function [] = getLIBSVMstd(trainpath, testpath, binary)
         if ~exist('binary', 'var')
             binary=1;
@@ -135,6 +176,23 @@ end
         Xu = Xtest;
     end
 
+    function [] = breakIntoParts()
+        X = [Xtrain; Xtest];
+        y = [ytrain; ytest];
+        N = size(X,1);
+        rand('seed', 0);
+        randind = randperm(N);
+        X = X(randind,:);
+        y = y(randind,:);
+        part = floor(N/3);
+        Xtrain = X(1:part,:);
+        Xtest = X(part+1:2*part,:);
+        Xu = X(2*part+1:end,:);
+        
+        ytrain = y(1:part,:);
+        ytest = y(part+1:2*part,:);
+    end
+
 end
 
 function [A, B] = makeEqual(A,B)
@@ -146,5 +204,6 @@ function [A, B] = makeEqual(A,B)
     end
     B = [ones(size(B,1),1), B];
     A = [ones(size(A,1),1), A];
+
 end
 

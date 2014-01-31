@@ -2,6 +2,7 @@ addpath(genpath('binaryLRloss'));
 load('example_data.mat');
 rand('seed', 0)
 C = cvpartition(y, 'kfold',2);
+%X = bsxfun(@rdivide, X, mean(X,1)+1e-10 );
 Xtest = X(C.test(1),:);
 ytest = y(C.test(1));
 Xtrain = X(C.test(2),:);
