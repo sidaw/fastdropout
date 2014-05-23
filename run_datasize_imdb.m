@@ -1,5 +1,5 @@
 addpath(genpath('binaryLRloss'));
- addpath(genpath('utils'));
+addpath(genpath('utils'));
 % load('~/Dropbox/projects/naiveBayes/data/rt10662/bigram_rts.mat');
 %load('~/Dropbox/projects/naiveBayes/data/20ng/bigram_ng20_atheisms_strip_noheader.mat');
 % load('~/Dropbox/projects/naiveBayes/data/rt2k/unigram_rt2k.mat');
@@ -39,13 +39,13 @@ mfOptions.MaxIter = 40;
 mfOptions.DerivativeCheck = 0;
 results = containers.Map;
 % l2set = [1e-5, 1e-4, 1e-3, 1e-2:0.02:0.08, 1e-1:0.1:0.9,1:5,10];
-datasubs = [0.002 0.004 0.008];% 0.02:0.02:0.08 0.15 0.3 0.7 1];
+datasubs = [0.002 0.004 0.008 0.02:0.02:0.08 0.15 0.3 0.7 1];
 %datasubs = [0.2 1];
 accs = []
 
 casenames = {'LR', 'NaiveBayes', 'DetDropout-0.2', 'DetDropout-0.5', 'DetDropout-0.8'};%, 'DetDropout-0.5', 'DetDropout-0.8'};
 casenames = {'LRsgd', 'NaiveBayes', 'Dropout-0.2', 'Dropout-0.5', 'Dropout-0.8'};%, 'DetDropout-0.5', 'DetDropout-0.8'};
-casenames = {'LR', 'NaiveBayes', 'Dropout-0.2', 'Dropout-0.5', 'Dropout-0.8'};%, 'DetDropout-0.5', 'DetDropout-0.8'};
+casenames = {'LRsgd', 'NaiveBayes', 'Dropout-0.2', 'Dropout-0.5', 'Dropout-0.8'};%, 'DetDropout-0.5', 'DetDropout-0.8'};
 %casenames = {'LRsgd', 'NaiveBayes', 'DetDropout-0.2', 'DetDropout-0.5', 'DetDropout-0.8'};%, 'DetDropout-0.5', 'DetDropout-0.8'};
 
 %casenames = {'LR', 'NaiveBayes', 'DetDropout-0.2', 'DetDropout-0.5', 'DetDropout-0.8'};%, 'DetDropout-0.5', 'DetDropout-0.8'};
