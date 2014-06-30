@@ -1,4 +1,6 @@
 addpath(genpath('binaryLRloss'));
+addpath(genpath('utils'));
+
 load('example_data.mat');
 rand('seed', 0)
 C = cvpartition(y, 'kfold',2);
