@@ -25,7 +25,7 @@ Similar multiclass loss functions are in ./softmaxLoss
 ```matlab
 
 % w: model weights
-% X: data matrix, dimdata by numdata
+% X: data of size numdata by dimdata in the design matrix convention.
 % y: binary label vector
 % ps: dropout rate
 
@@ -57,8 +57,8 @@ function [nll,g] = LogisticLossMCDropoutSampleGaussNumDiff(w,X,y,ps, numsample)
 ### Loss for 2 layer neural networks
 ```matlab
 
-% W: weights
-% X: data matrix, dimdata by numdata
+% W: weights, vectorized, @params decode contains how to intepret them
+% X: data of size numdata by dimdata in the design matrix convention
 % k: number of classes
 % decode: information on how to decode w
 % params: things like
