@@ -1,10 +1,14 @@
 # fastdropout
 
-Loss functions for fast dropout/dropout and baselines like softmax, and logistic regressions
-They are described in the readme file in the respective folders.
-To get the idea behind them, see the fast dropout paper on my website at nlp.stanford.edu/~sidaw
+This repo contains loss functions for dropout / Gaussian ("fast") dropout and the delta method dropout. These methods are described in our papers
 
-If you have minFunc, you can try running run_experiment.m
+Sida Wang and Chris Manning. Fast dropout training.
+ICML2013,
+
+Stefan Wager, Sida Wang and Percy Liang. Dropout Training as Adaptive Regularization.
+NIPS2013
+
+If you have minFunc, you can execute the script run_experiment.m
 The example_data loaded are vectors from the atheism vs. christian newsgroup task.
 With the fixed random seed, I got:
 
