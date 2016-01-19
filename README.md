@@ -42,7 +42,11 @@ function [nll,g] = LogisticLossDetObjDropout(w,X,y,ps)
 % This is eq 8) of the ICML paper, intergrating the Gaussian
 
 function [nll,g] = LogisticLossDetObjDropoutDelta(w,X,y,ps)
-% Dropout loss via the Delta approximation, somewhat less accurate
+% Dropout loss via the Delta method, somewhat less accurate. 
+% Note this is the loss function used in our later NIPS paper "Dropout as adaptive regularization"
+
+function [nll,g] = LogisticLossDetObjDropoutDeltaMoreData(w,X,y,ps,Xu,a)
+% The semisupervised version used in  "Dropout as adaptive regularization", where Xu is the unlabelled data, and a is the discounting coefficient.
 
 function [nll,g] = LogisticLossMCDropoutSampleGauss(w,X,y,ps, numsample)
 % Sample from the Gaussian
